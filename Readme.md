@@ -1,0 +1,3 @@
+# Grocy backend
+
+You can manage everything from here...
