@@ -67,4 +67,84 @@ const deleteUser = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, null, "User deleted successfully"));
 });
 
-export { addUser, getAllUsers, updateUser, deleteUser };
+// 5. Admin Dashboard: Counts (total, today, soft-deleted)
+const getUserCounts = asyncHandler(async (req, res) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const totalUsers = await User.countDocuments({ deletedAt: null });
+    const todaysUsers = await User.countDocuments({
+        deletedAt: null,
+        createdAt: { $gte: today }
+    });
+    const softDeletedUsers = await User.countDocuments({ deletedAt: { $ne: null } });
+
+    return res.status(200).json(new ApiResponse(200, {
+        totalUsers,
+        todaysUsers,
+        softDeletedUsers
+    }, "Dashboard counts fetched"));
+});
+
+// 6. Admin Dashboard: Last 5 Users
+const getRecentUsers = asyncHandler(async (req, res) => {
+    const users = await User.find({ deletedAt: null })
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .select("fullname email createdAt");
+
+    return res.status(200).json(new ApiResponse(200, users, "Recent users fetched"));
+});
+
+// 7. Admin Dashboard: Users in last 7 days (daily count)
+const getLast7DaysUsers = asyncHandler(async (req, res) => {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); // includes today
+
+    const stats = await User.aggregate([
+        { $match: { deletedAt: null, createdAt: { $gte: sevenDaysAgo } } },
+        {
+            $group: {
+                _id: {
+                    $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
+                },
+                count: { $sum: 1 }
+            }
+        },
+        { $sort: { _id: 1 } }
+    ]);
+
+    return res.status(200).json(new ApiResponse(200, stats, "Last 7 days user stats"));
+});
+
+// 8. Admin Dashboard: Users in last 4 weeks (weekly count)
+const getLast4WeeksUsers = asyncHandler(async (req, res) => {
+    const fourWeeksAgo = new Date();
+    fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 27); // 4 weeks * 7 days - includes today
+
+    const stats = await User.aggregate([
+        { $match: { deletedAt: null, createdAt: { $gte: fourWeeksAgo } } },
+        {
+            $group: {
+                _id: {
+                    $isoWeek: "$createdAt"
+                },
+                count: { $sum: 1 }
+            }
+        },
+        { $sort: { _id: 1 } }
+    ]);
+
+    return res.status(200).json(new ApiResponse(200, stats, "Last 4 weeks user stats"));
+});
+
+export {
+    addUser,
+    getAllUsers,
+    updateUser,
+    deleteUser,
+    getUserCounts,
+    getRecentUsers,
+    getLast7DaysUsers,
+    getLast4WeeksUsers
+};
