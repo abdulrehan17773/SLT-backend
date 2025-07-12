@@ -11,7 +11,6 @@
         email:{
             type: String,
             required: true,
-            unique: true,
             tolowercase: true,
             trim: true
         },
