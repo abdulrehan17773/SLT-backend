@@ -11,6 +11,6 @@ UserRouter.route("/refresh-token").post(tokenUpdate);
 UserRouter.use(checkAuth);
 UserRouter.route("/logout").post(logout);
 UserRouter.route("/current-user").get(currentUser);
-UserRouter.route("/update-profile").patch(updateProfile);
+UserRouter.route("/update-profile").put(updateProfile);
 
 export { UserRouter };  

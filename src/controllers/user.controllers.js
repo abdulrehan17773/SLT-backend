@@ -39,7 +39,7 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required");
     }
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: email.toLowerCase(), deletedAt: null  });
     if (userExists) {
         res.status(409);
         throw new ApiError(409, "User already exists");
@@ -72,7 +72,7 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Email and password are required");
     }
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: email.toLowerCase(), deletedAt: null  });
     if (!userExists) {
         res.status(404);
         throw new ApiError(404, "User not found");
