@@ -193,5 +193,17 @@ const updateProfile = asyncHandler(async (req, res) => {
     );
 });
 
+const checkTokens = asyncHandler(async (req, res) => {
+    const accessToken = req.cookies?.accessToken;
+    const refreshToken = req.cookies?.refreshToken;
 
-export { registerUser, loginUser, logout, tokenUpdate, currentUser, updateProfile };
+    if (!accessToken || !refreshToken) {
+        return res.status(200).json(new ApiResponse(200, { valid: false }, "Tokens not present"));
+    }
+
+    return res.status(200).json(new ApiResponse(200, { valid: true }, "Tokens are present"));
+});
+
+
+
+export { registerUser, loginUser, logout, tokenUpdate, currentUser, updateProfile, checkTokens };

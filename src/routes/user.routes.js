@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser, loginUser, logout, tokenUpdate, currentUser, updateProfile } from "../controllers/user.controllers.js";
+import { registerUser, loginUser, logout, tokenUpdate, currentUser, updateProfile, checkTokens } from "../controllers/user.controllers.js";
 import {checkLogin, checkAuth} from "../middlewares/checkAuth.middleware.js"
 
 const UserRouter = Router();
@@ -8,6 +8,7 @@ const UserRouter = Router();
 UserRouter.route("/register").post(registerUser);
 UserRouter.route("/login").post(checkLogin, loginUser);
 UserRouter.route("/refresh-token").post(tokenUpdate);
+UserRouter.route("/checkTokens").get(checkTokens);
 UserRouter.use(checkAuth);
 UserRouter.route("/logout").post(logout);
 UserRouter.route("/current-user").get(currentUser);
