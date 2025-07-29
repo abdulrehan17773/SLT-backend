@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { registerUser, loginUser, logout, tokenUpdate, currentUser, updateProfile, checkTokens } from "../controllers/user.controllers.js";
+import { registerUser, loginUser, logout, tokenUpdate, currentUser, updateProfile, checkTokens, addFeedback } from "../controllers/user.controllers.js";
 import {checkLogin, checkAuth} from "../middlewares/checkAuth.middleware.js"
+import checkFeedbackToday from "../middlewares/feedback.middleware.js";
 
 const UserRouter = Router();
 
@@ -13,5 +14,6 @@ UserRouter.use(checkAuth);
 UserRouter.route("/logout").post(logout);
 UserRouter.route("/current-user").get(currentUser);
 UserRouter.route("/update-profile").put(updateProfile);
+UserRouter.route("/feedback").post(checkFeedbackToday, addFeedback);
 
 export { UserRouter };  

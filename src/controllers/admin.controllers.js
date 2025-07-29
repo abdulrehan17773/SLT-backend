@@ -1,5 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.models.js";
+import  Feedback  from "../models/feedback.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
@@ -179,13 +180,44 @@ const getLast4WeeksUsers = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, stats, "Last 4 weeks user stats"));
 });
 
+// 9. Get All Feedbacks (for admin)
+const getAllFeedbacks = asyncHandler(async (req, res) => {
+  let { page = 1, limit = 10 } = req.query;
+
+  page = parseInt(page);
+  limit = parseInt(limit);
+  const skip = (page - 1) * limit;
+
+  const total = await Feedback.countDocuments();
+
+  const feedbacks = await Feedback.find()
+    .populate("user", "fullname email")
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  return res.status(200).json(
+    new ApiResponse(200, {
+      feedbacks,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    }, "All feedbacks fetched")
+  );
+});
+
+
 export {
-    addUser,
-    getAllUsers,
-    updateUser,
-    deleteUser,
-    getUserCounts,
-    getRecentUsers,
-    getLast7DaysUsers,
-    getLast4WeeksUsers
+  addUser,
+  getAllUsers,
+  updateUser,
+  deleteUser,
+  getUserCounts,
+  getRecentUsers,
+  getLast7DaysUsers,
+  getLast4WeeksUsers,
+  getAllFeedbacks
 };
