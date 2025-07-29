@@ -1,5 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.models.js";
+import  Feedback  from "../models/feedback.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
@@ -113,16 +114,19 @@ const getUserCounts = asyncHandler(async (req, res) => {
     today.setHours(0, 0, 0, 0);
 
     const totalUsers = await User.countDocuments({ deletedAt: null, role: { $ne: "Admin" } });
-    const todaysUsers = await User.countDocuments({
-        deletedAt: null,
-        role: { $ne: "Admin" },
-        createdAt: { $gte: today }
-    });
+
+    const feedbacks = await Feedback.find({}, "stars");
+    const totalFeedbacks = feedbacks.length;
+    const totalStars = feedbacks.reduce((sum, f) => sum + f.stars, 0);
+    const todaysUsers = totalFeedbacks > 0
+        ? Math.round((totalStars / totalFeedbacks) * 10) / 10
+        : 0;
+
     const softDeletedUsers = await User.countDocuments({ deletedAt: { $ne: null } });
 
     return res.status(200).json(new ApiResponse(200, {
         totalUsers,
-        todaysUsers,
+        todaysUsers, // averageRating with 1 decimal place (e.g. 3.5)
         softDeletedUsers
     }, "Dashboard counts fetched"));
 });
@@ -179,13 +183,44 @@ const getLast4WeeksUsers = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, stats, "Last 4 weeks user stats"));
 });
 
+// 9. Get All Feedbacks (for admin)
+const getAllFeedbacks = asyncHandler(async (req, res) => {
+  let { page = 1, limit = 10 } = req.query;
+
+  page = parseInt(page);
+  limit = parseInt(limit);
+  const skip = (page - 1) * limit;
+
+  const total = await Feedback.countDocuments();
+
+  const feedbacks = await Feedback.find()
+    .populate("user", "fullname email")
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  return res.status(200).json(
+    new ApiResponse(200, {
+      feedbacks,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    }, "All feedbacks fetched")
+  );
+});
+
+
 export {
-    addUser,
-    getAllUsers,
-    updateUser,
-    deleteUser,
-    getUserCounts,
-    getRecentUsers,
-    getLast7DaysUsers,
-    getLast4WeeksUsers
+  addUser,
+  getAllUsers,
+  updateUser,
+  deleteUser,
+  getUserCounts,
+  getRecentUsers,
+  getLast7DaysUsers,
+  getLast4WeeksUsers,
+  getAllFeedbacks
 };

@@ -1,5 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.models.js";
+import Feedback from "../models/feedback.models.js"; 
 import { ApiError } from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
@@ -204,6 +205,25 @@ const checkTokens = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, { valid: true }, "Tokens are present"));
 });
 
+const addFeedback = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+    const { feedback, stars } = req.body;
+
+    if (!feedback || !stars) {
+        throw new ApiError(400, "Feedback and star rating are required");
+    }
+
+    const newFeedback = await Feedback.create({
+        user: userId,
+        feedback,
+        stars,
+    });
+
+    return res.status(201).json(
+        new ApiResponse(201, newFeedback, "Feedback submitted successfully")
+    );
+});
 
 
-export { registerUser, loginUser, logout, tokenUpdate, currentUser, updateProfile, checkTokens };
+export { registerUser, loginUser, logout, tokenUpdate, currentUser, updateProfile, checkTokens, addFeedback };
+
