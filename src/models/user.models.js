@@ -25,6 +25,14 @@
         refreshToken: {
             type: String,
         },
+        resetPasswordCode: {
+            type: String,
+            default: null
+        },
+        resetPasswordExpiry: {
+            type: Date,
+            default: null
+        },
         deletedAt: {
             type: Date,
             default: null
