@@ -114,16 +114,19 @@ const getUserCounts = asyncHandler(async (req, res) => {
     today.setHours(0, 0, 0, 0);
 
     const totalUsers = await User.countDocuments({ deletedAt: null, role: { $ne: "Admin" } });
-    const todaysUsers = await User.countDocuments({
-        deletedAt: null,
-        role: { $ne: "Admin" },
-        createdAt: { $gte: today }
-    });
+
+    const feedbacks = await Feedback.find({}, "stars");
+    const totalFeedbacks = feedbacks.length;
+    const totalStars = feedbacks.reduce((sum, f) => sum + f.stars, 0);
+    const todaysUsers = totalFeedbacks > 0
+        ? Math.round((totalStars / totalFeedbacks) * 10) / 10
+        : 0;
+
     const softDeletedUsers = await User.countDocuments({ deletedAt: { $ne: null } });
 
     return res.status(200).json(new ApiResponse(200, {
         totalUsers,
-        todaysUsers,
+        todaysUsers, // averageRating with 1 decimal place (e.g. 3.5)
         softDeletedUsers
     }, "Dashboard counts fetched"));
 });
