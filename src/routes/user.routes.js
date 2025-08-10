@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { registerUser, loginUser, logout, tokenUpdate, currentUser, updateProfile, checkTokens, addFeedback, resetPassword,sendResetCode } from "../controllers/user.controllers.js";
+import {helloWorld, registerUser, loginUser, logout, tokenUpdate, currentUser, updateProfile, checkTokens, addFeedback, resetPassword,sendResetCode } from "../controllers/user.controllers.js";
 import {checkLogin, checkAuth} from "../middlewares/checkAuth.middleware.js"
 import checkFeedbackToday from "../middlewares/feedback.middleware.js";
 
 const UserRouter = Router();
 
 // // unsecure routes
+UserRouter.route("/hello").get(helloWorld);
 UserRouter.route("/register").post(registerUser);
 UserRouter.route("/login").post(checkLogin, loginUser);
 UserRouter.route("/refresh-token").post(tokenUpdate);

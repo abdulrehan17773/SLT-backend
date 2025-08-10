@@ -285,6 +285,12 @@ const resetPassword = asyncHandler(async (req, res) => {
 });
 
 
+const helloWorld = asyncHandler(async (req, res) => {
+    return res.status(200).json(
+        new ApiResponse(200, "Profile updated successfully")
+    );
+})
 
-export { registerUser, loginUser, logout, tokenUpdate, currentUser, updateProfile, checkTokens, addFeedback, sendResetCode, resetPassword };
+
+export { registerUser, loginUser, logout, tokenUpdate, currentUser, updateProfile, checkTokens, addFeedback, sendResetCode, resetPassword, helloWorld };
 
