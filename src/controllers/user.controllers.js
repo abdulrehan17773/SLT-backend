@@ -96,6 +96,13 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Server error");
     }
 
+    const options = {
+        httpOnly: true,       // Prevents JS access
+        secure: true,         // Cookie only sent over HTTPS
+        sameSite: "none",     // Required for cross-site cookies
+        path: "/",            // Makes cookie accessible to entire site
+    };
+
     return res.status(200)
         .cookie("refreshToken", refreshToken, options)
         .cookie("accessToken", accessToken, options)
