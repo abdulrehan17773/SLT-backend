@@ -112,15 +112,15 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const logout = asyncHandler(async (req, res) => {
-    const updatedUser = await User.findByIdAndUpdate(
-        req.user._id,
-        { $set: { refreshToken: null } },
-        { new: true }
-    );
+    // const updatedUser = await User.findByIdAndUpdate(
+    //     req.user._id,
+    //     { $set: { refreshToken: null } },
+    //     { new: true }
+    // );
 
-    if (!updatedUser) {
-        return res.status(404).json(new ApiResponse(404, null, "User not found"));
-    }
+    // if (!updatedUser) {
+    //     return res.status(404).json(new ApiResponse(404, null, "User not found"));
+    // }
 
     const isProduction = process.env.NODE_ENV === "production";
 
