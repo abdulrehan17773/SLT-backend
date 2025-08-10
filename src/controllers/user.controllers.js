@@ -122,10 +122,21 @@ const logout = asyncHandler(async (req, res) => {
         return res.status(404).json(new ApiResponse(404, null, "User not found"));
     }
 
-    res.status(200)
-        .clearCookie("refreshToken", null, options)
-        .clearCookie("accessToken", null, options)
-        .json(new ApiResponse(200, null, "User logged out successfully"));
+    const isProduction = process.env.NODE_ENV === "production";
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+  path: "/",  // must match original cookie path
+};
+
+// ✅ Logout route
+res.status(200)
+  .clearCookie("refreshToken", cookieOptions)
+  .clearCookie("accessToken", cookieOptions)
+  .json(new ApiResponse(200, null, "User logged out successfully"));
+
 });
 
 const tokenUpdate = asyncHandler(async (req, res) => {
