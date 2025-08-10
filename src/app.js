@@ -8,9 +8,11 @@ const app = express();
 
 // define cors middleware here
 app.use(cors({
-    origin: [process.env.CLIENT_URL],  // Ensure CLIENT_URL is correctly set in your environment variables
-    credentials: true  // This ensures cookies can be sent with cross-origin requests
-}));
+  origin: [process.env.CLIENT_URL],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}))
 
 // define json middleware here
 app.use(express.json({ limit: '50mb' }));  // This is good for handling large JSON payloads
