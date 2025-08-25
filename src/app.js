@@ -5,14 +5,15 @@ import handleError from './middlewares/handleError.middleware.js';
 
 // create express app
 const app = express();
-
+const orign = ["http://localhost:5173", "https://slt-front.vercel.app/"]
 // define cors middleware here
 app.use(cors({
-  origin: [process.env.CLIENT_URL],
+  origin: orign,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }))
+
 
 // define json middleware here
 app.use(express.json({ limit: '50mb' }));  // This is good for handling large JSON payloads
