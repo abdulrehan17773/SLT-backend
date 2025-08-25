@@ -5,7 +5,7 @@ import handleError from './middlewares/handleError.middleware.js';
 
 // create express app
 const app = express();
-const orign = ["http://localhost:5173", "https://slt-front.vercel.app/"]
+const orign = ["http://localhost:5173", "https://slt-front.vercel.app"]
 // define cors middleware here
 app.use(cors({
   origin: orign,
